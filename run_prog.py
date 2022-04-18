@@ -5,41 +5,88 @@ import numpy as np
 import os
 import time
 import cv2
+import threading, queue
 
-def run(vid,engine):
+from WebcamStream import WebcamStream
+from threadscheduler import ODD, EVEN
+
+inp_h = 360#480
+inp_w = 480#640
+
+def run(engine, model):
+  # initializing and starting multi-threaded webcam input stream 
+  webcam_stream = WebcamStream(0, inp_h, inp_w) # 0 id for main camera
+  webcam_stream.start()
+    
   start = time.time()
-  count = 0
-  while(time.time()-start < 30):
-    ret, img = vid.read()
-  
-    # You may need to convert the color.
-    img = cv2.cvtColor(img, cv2.IMREAD_COLOR)
-    #img = cv2.resize(img, (480, 360))
-    pil_image = Image.fromarray(img)
+  idx = 0
+  queue_to_main, queue_to_worker = queue.Queue(), queue.Queue()
+  odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+  even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+  lock = threading.Lock()
+  while(True):#time.time()-start < 30):
+    print(idx)
+    if webcam_stream.stopped is True :
+        break
+    else :
+        if idx == 0:
+            frame = webcam_stream.read()
+            print("Even: {}".format(even_thread.is_alive()))
+            even_thread.start()
+            idx += 1
+            queue_to_worker.put(frame)
+        else:
+            if odd_thread.is_alive() == True or even_thread.is_alive() == True:
+                i = queue_to_main.get()
+            elif i == "":
+                if idx%2 == 0: i = "call even"
+                elif idx%2 == 0: i = "call even"
+            #print(i)
+            if i == "call even":
+                if even_thread.is_alive() == True:
+                    continue
+                lock.acquire()
+                print("Even: {}".format(even_thread.is_alive()))
+                even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+                frame = webcam_stream.read()
+                even_thread.start()
+                idx += 1
+                queue_to_worker.put(frame)
+                lock.release()
+            elif i == "call odd":
+                if odd_thread.is_alive() == True:
+                    continue  
+                lock.acquire()
+                print("Odd: {}".format(odd_thread.is_alive()))
+                odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+                frame = webcam_stream.read()
+                odd_thread.start()
+                idx += 1
+                queue_to_worker.put(frame)
+                lock.release()
+            elif i == "odd Done":  
+                lock.acquire()
+                pic = odd_thread.ret()
+                #odd_thread.join()
+                cv2.imshow('frame' , pic)
+                lock.release()
+            elif i == "even Done": 
+                lock.acquire() 
+                pic = even_thread.ret()
+                #even_thread.join()
+                cv2.imshow('frame' , pic) 
+                lock.release()
+            i = ""
+            #cv2.imshow("Testing",frame)
+            key = cv2.waitKey(1)
 
-    poses, inference_time = engine.DetectPosesInImage(pil_image)
-    #print('Inference time: %.f ms' % (inference_time * 1000))
-
-    for pose in poses:
-      if pose.score < 0.3: continue
-      #print('\nCheckinggggggg')
-      for label, keypoint in pose.keypoints.items():
-          #print('  %-20s x=%-4d y=%-4d score=%.1f' %
-          #      (label.name, keypoint.point[0], keypoint.point[1], keypoint.score))
-          cv2.circle(img, (int(keypoint.point[0]), int(keypoint.point[1])), 5, [0, 224, 255], -1)
-    #print(int(1/(inference_time)))
-    count += 1
-    cv2.imshow("Check",img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-       break
-
-  print(count/(time.time()-start))
+            if key == ord('q'):
+                webcam_stream.stop() # stop the webcam stream
+                break
 
 if __name__ == '__main__':
- 
-  vid = cv2.VideoCapture(0)
   engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-  
-  run(vid,engine)
+  model = 0
+  run(engine, model)
   
 
