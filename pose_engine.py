@@ -35,13 +35,13 @@ POSENET_SHARED_LIB = os.path.join(
 
 class KeypointType(enum.IntEnum):
     """Pose kepoints."""
-    NOSE = 0
-    LEFT_EYE = 1
-    RIGHT_EYE = 2
-    LEFT_EAR = 3
-    RIGHT_EAR = 4
-    LEFT_SHOULDER = 5
-    RIGHT_SHOULDER = 6
+    nose = 0
+    l_eye = 1
+    r_eye = 2
+    l_ear = 3
+    r_ear = 4
+    l_sho = 5
+    r_sho = 6
     LEFT_ELBOW = 7
     RIGHT_ELBOW = 8
     LEFT_WRIST = 9
@@ -52,7 +52,7 @@ class KeypointType(enum.IntEnum):
     RIGHT_KNEE = 14
     LEFT_ANKLE = 15
     RIGHT_ANKLE = 16
-    BASE = 17				#added
+    neck = 17				#added
 
 
 Point = collections.namedtuple('Point', ['x', 'y'])
