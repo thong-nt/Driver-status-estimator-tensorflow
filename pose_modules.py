@@ -9,7 +9,8 @@ from PIL import Image
 def_h = 480
 def_w = 640
 
-features = ["nose_x", "nose_y", "neck_x", "neck_y",	"r_sho_x", "r_sho_y", "l_sho_x", "l_sho_y",	"r_eye_x",	"r_eye_y",	"l_eye_x",	"l_eye_y",	"r_ear_x",	"r_ear_y",	"l_ear_x",	"l_ear_y"]
+features = ["neck_x", "neck_y", "nose_x", "nose_y",  "l_sho_x", "l_sho_y", "r_sho_x", "r_sho_y", "l_eye_x",	"l_eye_y", "r_eye_x", "r_eye_y",
+    	"l_ear_x",	"l_ear_y", "r_ear_x",	"r_ear_y"]
 fdist = ['NeNo','NeLs','NeRs','NeLey','NeRey','NeLea','NeRea']
 state = ['Safe', 'Distracted']
 def Dis(xa,ya,xb,yb):
@@ -20,17 +21,14 @@ def Dis(xa,ya,xb,yb):
     return dist
 
 def get_dist(df,df_dist):
-    df_dist.at[0,'NeNo']  = Dis(df['neck_x'][0], df['neck_y'][0], df['nose_x'][0], df['nose_y'][0])
-    df_dist.at[0,'NeLs']  = Dis(df['neck_x'][0], df['neck_y'][0], df['l_sho_x'][0], df['l_sho_y'][0])
-    df_dist.at[0,'NeRs']  = Dis(df['neck_x'][0], df['neck_y'][0], df['r_sho_x'][0], df['r_sho_y'][0])
-    df_dist.at[0,'NeLey'] = Dis(df['neck_x'][0], df['neck_y'][0], df['l_eye_x'][0], df['l_eye_y'][0])
-    df_dist.at[0,'NeRey'] = Dis(df['neck_x'][0], df['neck_y'][0], df['r_eye_x'][0], df['r_eye_y'][0])
-    df_dist.at[0,'NeLea'] = Dis(df['neck_x'][0], df['neck_y'][0], df['l_ear_x'][0], df['l_ear_y'][0])
-    df_dist.at[0,'NeRea'] = Dis(df['neck_x'][0], df['neck_y'][0], df['r_ear_x'][0], df['r_ear_y'][0])
+    comp_ = 2
+    dex = []
+    for fea_ in fdist:
+        df_dist.at[0,fea_]  = Dis(df['neck_x'][0], df['neck_y'][0], df[features[comp_]][0], df[features[comp_+1]][0])
+        dex.append(df_dist.at[0,fea_])
+        comp_ += 2
 
-    dex = [df_dist['NeNo'][0],df_dist['NeLs'][0],df_dist['NeRs'][0],df_dist['NeLey'][0],df_dist['NeRey'][0],df_dist['NeLea'][0],df_dist['NeRea'][0]]
     maxV = max(dex)
-
     df_dist.loc[0] = df_dist.loc[0]/maxV
     return df_dist
 
@@ -63,7 +61,7 @@ def detect_pose(engine, img, inp_h, inp_w):
 
 def detect_status(model, poses, img):
     if poses.size == 0:
-        cv2.putText(img, "Distracted", (0,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3)
+        cv2.putText(img, state[1], (0,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3)
     else:
         y_pred = model.predict(poses)
         cv2.putText(img, state[y_pred[0]], (0,40), cv2.FONT_HERSHEY_SIMPLEX,1,(209, 80, 0, 255), 3) 
