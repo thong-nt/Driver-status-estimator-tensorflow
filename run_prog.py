@@ -49,7 +49,7 @@ def run(engine, model):
                 lock.acquire()
                 #print("Even: {}".format(even_thread.is_alive()))
                 even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
-                frame = webcam_stream.read()
+                frame = cv2.flip(webcam_stream.read() , 1)
                 even_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)
@@ -60,7 +60,7 @@ def run(engine, model):
                 lock.acquire()
                 #print("Odd: {}".format(odd_thread.is_alive()))
                 odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
-                frame = webcam_stream.read()
+                frame = cv2.flip(webcam_stream.read() , 1)
                 odd_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)

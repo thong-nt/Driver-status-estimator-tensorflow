@@ -39,7 +39,7 @@ def get_dist(df,df_dist,idx):
 
 if __name__ == '__main__':
     engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-    d = "/media/zek/UBUNTU 20_0/Newdataset/0/"
+    d = "/media/zek/UBUNTU 20_0/Newdataset/check/1/"
     df = pd.DataFrame(columns=features)
     df_dist = pd.DataFrame(columns=fdist)
 
@@ -77,5 +77,5 @@ if __name__ == '__main__':
             idx += 1
         
     print(df_dist)
-    file = '/media/zek/UBUNTU 20_0/Newdataset/files/true.csv'
+    file = '/media/zek/UBUNTU 20_0/Newdataset/files/false_16th_May.csv'
     df_dist.to_csv(file, index=False)
