@@ -69,6 +69,7 @@ def handle_client(conn, addr):
             conn.send("Msg received".encode(FORMAT))
 
     conn.close()
+    return False
         
 
 def start():
@@ -76,9 +77,13 @@ def start():
     print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         conn, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+        #thread = threading.Thread(target=handle_client, args=(conn, addr))
+        #thread.start()
+        
+        if (handle_client(conn, addr)) == False:
+            print(f"[{addr}] Server closed!")
+            break
+        #print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
 
 print("[STARTING] server is starting...")
