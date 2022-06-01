@@ -17,11 +17,19 @@ if grep -s -q "MX8MQ" /sys/firmware/devicetree/base/model; then
   echo "Installing DevBoard specific dependencies"
   sudo apt-get install python3-pip python3-numpy
   sudo pip3 install svgwrite
-  sudo pip3 install python-periphery 
+  sudo pip3 install python-periphery
+  sudo pip3 install opencv-python
+  sudo pip3 install typing_extensions
+  sudo pip3 install pandas
+  sudo pip3 install sklearn
 else
   # Install gstreamer 
-  sudo apt-get install -y gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python3-gst-1.0 python3-gi gobject-introspection gir1.2-gtk-3.0 python3-numpy
+  #sudo apt-get install -y gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python3-gst-1.0 python3-gi gobject-introspection gir1.2-gtk-3.0 python3-numpy
   pip3 install svgwrite
+  sudo pip3 install opencv-python
+  sudo pip3 install typing_extensions
+  sudo pip3 install pandas
+  sudo pip3 install sklearn
 
   if grep -s -q "Raspberry Pi" /sys/firmware/devicetree/base/model; then
     echo "Installing Raspberry Pi specific dependencies"
