@@ -23,22 +23,19 @@ class ODD(threading.Thread):
         self.w = in_w
         self.h = in_h
         self.threadlock = threading.Lock()
-        self.chek = None
+        self.proc_img = None
+        self.status = None
 
     def run(self):
         img1 = self.queue_worker.get()
-        self.chek, df = detect_pose(self.tpu, img1, self.w, self.h)
+        self.proc_img, df = detect_pose(self.tpu, img1, self.w, self.h)
         self.queue_main.put('call even')
-        self.chek = detect_status(self.model,df,self.chek)
-        #if len(current_poses) > 0:
-        #    self.threadlock.acquire()
-        #    img1 = get_res(df, df_dist, self.idx, current_poses, self.model, img1)
-        #    self.threadlock.release()
+        self.proc_img, self.status = detect_status(self.model,df,self.proc_img)
         self.queue_main.put('odd Done')
     
     def ret(self):
         threading.Thread.join(self)
-        return self.chek
+        return self.proc_img, self.status
 
 class EVEN(threading.Thread):
 
@@ -52,19 +49,16 @@ class EVEN(threading.Thread):
         self.w = in_w
         self.h = in_h
         self.threadlock = threading.Lock()
-        self.chek = None
+        self.proc_img = None
+        self.status = None
 
     def run(self):
         img2 = self.queue_worker.get()
-        self.chek, df = detect_pose(self.tpu, img2, self.w, self.h)
+        self.proc_img, df = detect_pose(self.tpu, img2, self.w, self.h)
         self.queue_main.put('call odd')
-        self.chek = detect_status(self.model,df,self.chek)
-        #if len(current_poses) > 0:
-        #    self.threadlock.acquire()
-        #    img1 = get_res(df, df_dist, self.idx, current_poses, self.model, img2)
-        #    self.threadlock.release()
+        self.proc_img, self.status = detect_status(self.model,df,self.proc_img)
         self.queue_main.put('even Done')
         
     def ret(self):
         threading.Thread.join(self)
-        return self.chek
+        return self.proc_img, self.status

@@ -60,10 +60,13 @@ def detect_pose(engine, img, inp_h, inp_w):
     return img, df_dist
 
 def detect_status(model, poses, img):
+    status = None
     if poses.size == 0:
         cv2.putText(img, state[1], (0,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3)
+        status = state[1]
     else:
         y_pred = model.predict(poses)
         cv2.putText(img, state[y_pred[0]], (0,40), cv2.FONT_HERSHEY_SIMPLEX,1,(209, 80, 0, 255), 3) 
+        status = state[y_pred[0]]
     #time.sleep(0.05)
-    return img
+    return img, status
