@@ -6,6 +6,7 @@ import pandas as pd
 from pose_engine import PoseEngine
 from PIL import Image
 
+#default frame size of the model
 def_h = 480
 def_w = 640
 
@@ -41,13 +42,18 @@ def detect_pose(engine, img, inp_h, inp_w):
     #print('Inference time: %.f ms' % (inference_time * 1000))
     df = pd.DataFrame(columns=features)
     df_dist = pd.DataFrame(columns=fdist)
-
+    dir = "?"
     for pose in poses:
       if pose.score < 0.25: continue
       
       for label, keypoint in pose.keypoints.items():
         #print('  %-20s x=%-4d y=%-4d score=%.1f' %
         #        (label.name, keypoint.point[0], keypoint.point[1], keypoint.score))
+        if label.name == "nose":
+            if keypoint.point[0]*(inp_w/def_w) < inp_w/2-20: dir = "L"
+            elif keypoint.point[0]*(inp_w/def_w) > inp_w/2+20: dir = "R"
+            else: dir = "?"
+
         cv2.circle(img, (int(keypoint.point[0]*(inp_w/def_w)), 
                            int(keypoint.point[1]*(inp_h/def_h))), 3, [0, 224, 255], -1)
         df.at[0,label.name+'_x'] = keypoint.point[0]*(inp_w/def_w)
@@ -57,7 +63,7 @@ def detect_pose(engine, img, inp_h, inp_w):
     if df.size > 0:
         get_dist(df,df_dist)
     #print(df_dist)
-    return img, df_dist
+    return img, df_dist, dir
 
 def detect_status(model, poses, img):
     status = None

@@ -45,6 +45,7 @@ class Client:
         print(self.client.recv(2048).decode(FORMAT))
         #self.t.join()
 
+'''
 if __name__ == '__main__':
     check = Client(HEADER = 64, PORT = 5050, SERVER = "10.42.0.21")
     check.start()
@@ -58,3 +59,4 @@ if __name__ == '__main__':
             break
         else:
             check.get_message(mes)
+'''

@@ -23,7 +23,7 @@ class Warning:
        while True:
           if self.stopped is True :
              break
-          if self.status == "0":
+          if self.status == "Distracted":
              buzzer.on()
           else:
              buzzer.off()

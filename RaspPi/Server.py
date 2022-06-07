@@ -1,9 +1,10 @@
-  GNU nano 5.4                                                                                                       Server.py                                                                                                                
 import socket 
 import threading
 import signal
 import sys
 import RPi.GPIO as GPIO
+
+from Buzzer import Warning
 
 HEADER = 64
 PORT = 5050
@@ -19,7 +20,7 @@ BUTTON_RIGHT = 27
 
 status = ""
 check_ = "init"
-def handle_client(conn, addr):
+def handle_client(conn, addr, buzz):
     print(f"[NEW CONNECTION] {addr} connected.")
     connected = True
     settup_IO()
@@ -28,6 +29,7 @@ def handle_client(conn, addr):
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
+            buzz.get_status(msg)
             if msg == DISCONNECT_MESSAGE:
                 connected = False
 
@@ -37,17 +39,16 @@ def handle_client(conn, addr):
 def start():
     server.listen()
     print(f"[LISTENING] Server is listening on {SERVER}")
+    buzz = Warning()
+    buzz.start()
     while True:
         conn, addr = server.accept()
-        #thread = threading.Thread(target=handle_client, args=(conn, addr))
-        #thread.start()
-
-        if (handle_client(conn, addr)) == False:
+        if (handle_client(conn, addr, buzz)) == False:
             print(f"[{addr}]  Server closed!")
             conn.send("Server closed!".encode(FORMAT))
             conn.close()
+            buzz.stop()
             break
-        #print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
 def input_direction(argument):
     switcher = {
@@ -92,3 +93,4 @@ if __name__ == '__main__':
    server.bind(ADDR)
    print("[STARTING] server is starting...")
    start()
+
