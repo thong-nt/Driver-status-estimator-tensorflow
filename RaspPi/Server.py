@@ -1,3 +1,4 @@
+  GNU nano 5.4                                                                                                       Server.py                                                                                                                
 import socket 
 import threading
 import signal
@@ -20,6 +21,7 @@ BUTTON_RIGHT = 27
 
 status = ""
 check_ = "init"
+
 def handle_client(conn, addr, buzz):
     print(f"[NEW CONNECTION] {addr} connected.")
     connected = True
@@ -29,11 +31,11 @@ def handle_client(conn, addr, buzz):
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
-            buzz.get_status(msg)
+            buzz.get_status(msg,status)
             if msg == DISCONNECT_MESSAGE:
                 connected = False
 
-            print(f"[{addr}] {msg} - Dir: {status} ")
+            print(f"[{addr}] {msg} - Direction: {status}")
     return False
 
 def start():
@@ -50,12 +52,13 @@ def start():
             buzz.stop()
             break
 
+
 def input_direction(argument):
     switcher = {
-        16: "Move straight ahead",
-        17: "Reversing",
-        22: "Turn left",
-        27: "Turn right",
+        16: "M",                         #Move straight ahead
+        17: "Re",                        #Reversing 
+        22: "L",                         #Turn Left
+        27: "R",                         #Turn right
     }
     return switcher.get(argument, "nothing")
 
@@ -93,4 +96,5 @@ if __name__ == '__main__':
    server.bind(ADDR)
    print("[STARTING] server is starting...")
    start()
+
 

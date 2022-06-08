@@ -9,6 +9,8 @@ buzzer = Buzzer(26)
 class Warning:
    def __init__(self):
        self.status = "None"
+       self.act_dir= "None"
+       self.but_dir= "None"
        # self.stopped is initialized to False 
        self.stopped = True
        # thread instantiation  
@@ -24,12 +26,18 @@ class Warning:
           if self.stopped is True :
              break
           if self.status == "Distracted":
-             buzzer.on()
+             if self.act_dir != self.but:
+                buzzer.on()
+             else:
+                buzzer.off()
           else:
              buzzer.off()
 
-   def get_status(self, data):
-       self.status = data
+   def get_status(self, data, but):
+       self.status = data.split('!')[0]
+       self.act_dir = data.split('!')[1]
+       self.but = but
+
 
    def stop(self):
         self.stopped = True
