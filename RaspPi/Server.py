@@ -1,4 +1,3 @@
-  GNU nano 5.4                                                                                                       Server.py                                                                                                                
 import socket 
 import threading
 import signal
@@ -6,6 +5,7 @@ import sys
 import RPi.GPIO as GPIO
 
 from Buzzer import Warning
+from Oled import OLED
 
 HEADER = 64
 PORT = 5050
@@ -19,10 +19,9 @@ BUTTON_DOWN = 17
 BUTTON_LEFT = 22
 BUTTON_RIGHT = 27
 
-status = ""
+status = "M"
 check_ = "init"
-
-def handle_client(conn, addr, buzz):
+def handle_client(conn, addr, buzz, disp):
     print(f"[NEW CONNECTION] {addr} connected.")
     connected = True
     settup_IO()
@@ -32,26 +31,32 @@ def handle_client(conn, addr, buzz):
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
             buzz.get_status(msg,status)
+            disp.update(status,msg)
             if msg == DISCONNECT_MESSAGE:
                 connected = False
 
             print(f"[{addr}] {msg} - Direction: {status}")
     return False
 
+
 def start():
     server.listen()
     print(f"[LISTENING] Server is listening on {SERVER}")
+    #Initialize Buzzer task
     buzz = Warning()
     buzz.start()
+    #Initialize OLED interface
+    disp = OLED()
+    disp.start()
     while True:
         conn, addr = server.accept()
-        if (handle_client(conn, addr, buzz)) == False:
+        if (handle_client(conn, addr, buzz, disp)) == False:
             print(f"[{addr}]  Server closed!")
             conn.send("Server closed!".encode(FORMAT))
             conn.close()
             buzz.stop()
+            disp.stop()
             break
-
 
 def input_direction(argument):
     switcher = {
@@ -72,6 +77,7 @@ def button_pressed_callback(channel):
     if status != check_:
        print(status)
        check_ = status
+
 
 def settup_IO():
     GPIO.setmode(GPIO.BCM)
@@ -96,5 +102,6 @@ if __name__ == '__main__':
    server.bind(ADDR)
    print("[STARTING] server is starting...")
    start()
+
 
 
