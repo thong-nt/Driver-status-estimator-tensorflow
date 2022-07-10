@@ -1,4 +1,3 @@
-  GNU nano 5.4                                                                                                       Buzzer.py                                                                                                                
 import threading
 
 from gpiozero import Buzzer
