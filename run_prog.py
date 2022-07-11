@@ -21,8 +21,8 @@ def run(engine, model):
   webcam_stream = WebcamStream(0, inp_h, inp_w) # 0 id for main camera
   webcam_stream.start()
 
-  connect_pi = Client(HEADER = 64, PORT = 5050, SERVER = "10.42.0.21")
-  connect_pi.start()
+  #connect_pi = Client(HEADER = 64, PORT = 5050, SERVER = "10.42.0.21")
+  #connect_pi.start()
 
   idx = 0
   previouse_frame = 0
@@ -74,7 +74,7 @@ def run(engine, model):
                 lock.acquire()
                 pic, status = odd_thread.ret()
                 #odd_thread.join()
-                connect_pi.get_message(status)
+                #connect_pi.get_message(status)
                 cv2.imshow('frame' , pic)
                 lock.release()
                 print("fps:", int(1 / (time.time() - previouse_frame)))
@@ -82,7 +82,7 @@ def run(engine, model):
                 lock.acquire() 
                 pic, status = even_thread.ret()
                 #even_thread.join()
-                connect_pi.get_message(status)
+                #connect_pi.get_message(status)
                 cv2.imshow('frame' , pic) 
                 lock.release()
                 previouse_frame = time.time()
@@ -90,8 +90,8 @@ def run(engine, model):
             key = cv2.waitKey(1)
 
             if key == ord('q'):
-                connect_pi.stop()
-                connect_pi.client.shutdown(socket.SHUT_WR)
+                #connect_pi.stop()
+                #connect_pi.client.shutdown(socket.SHUT_WR)
                 webcam_stream.stop() # stop the webcam stream
                 break
   
@@ -99,7 +99,7 @@ def run(engine, model):
 
 if __name__ == '__main__':
   engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-  model = pickle.load(open("models/finalized_model.sav", 'rb'))
+  model = pickle.load(open("models/finalized_model_3fea.sav", 'rb'))
   run(engine, model)
   
 

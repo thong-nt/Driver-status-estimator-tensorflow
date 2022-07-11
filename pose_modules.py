@@ -63,6 +63,7 @@ def detect_pose(engine, img, inp_h, inp_w):
     if df.size > 0:
         get_dist(df,df_dist)
     #print(df_dist)
+    df_dist = df_dist.drop(['NeLs', 'NeRs', 'NeLea', 'NeRea'], axis=1)
     return img, df_dist, dir
 
 def detect_status(model, poses, img):
