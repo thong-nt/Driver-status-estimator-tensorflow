@@ -39,7 +39,7 @@ def detect_pose(engine, img, inp_h, inp_w):
 
     pil_image = Image.fromarray(img)
     poses, inference_time = engine.DetectPosesInImage(pil_image)
-    #print('Inference time: %.f ms' % (inference_time * 1000))
+
     df = pd.DataFrame(columns=features)
     df_dist = pd.DataFrame(columns=fdist)
     dir = "?"
@@ -58,12 +58,10 @@ def detect_pose(engine, img, inp_h, inp_w):
                            int(keypoint.point[1]*(inp_h/def_h))), 3, [0, 224, 255], -1)
         df.at[0,label.name+'_x'] = keypoint.point[0]*(inp_w/def_w)
         df.at[0,label.name+'_y'] = keypoint.point[1]*(inp_h/def_h)
-    #print(int(1/(inference_time)))
-    #print(df)
+
     if df.size > 0:
         get_dist(df,df_dist)
-    #print(df_dist)
-    df_dist = df_dist.drop(['NeLs', 'NeRs', 'NeLea', 'NeRea'], axis=1)
+
     return img, df_dist, dir
 
 def detect_status(model, poses, img):
@@ -75,5 +73,5 @@ def detect_status(model, poses, img):
         y_pred = model.predict(poses)
         cv2.putText(img, state[y_pred[0]], (0,40), cv2.FONT_HERSHEY_SIMPLEX,1,(209, 80, 0, 255), 3) 
         status = state[y_pred[0]]
-    #time.sleep(0.05)
+
     return img, status
