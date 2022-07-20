@@ -48,3 +48,4 @@ class Warning:
    def stop(self):
         self.stopped = True
         self.t.join()
+        buzzer.off()

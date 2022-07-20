@@ -51,8 +51,9 @@ def run(engine, model):
                 if even_thread.is_alive() == True:
                     continue
                 lock.acquire()
-                even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
-                frame = cv2.flip(webcam_stream.read() , 1)
+                #even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+                even_thread = EVEN(200, 280, queue_to_main, queue_to_worker, engine, model, idx)
+                frame = cv2.flip(webcam_stream.read()[100:300,120:400] , 1)
                 even_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)
@@ -61,8 +62,9 @@ def run(engine, model):
                 if odd_thread.is_alive() == True:
                     continue  
                 lock.acquire()
-                odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
-                frame = cv2.flip(webcam_stream.read() , 1)
+                #odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
+                odd_thread = ODD(200, 280, queue_to_main, queue_to_worker, engine, model, idx)
+                frame = cv2.flip(webcam_stream.read()[100:300,120:400] , 1)
                 odd_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)

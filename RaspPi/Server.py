@@ -85,12 +85,10 @@ def signal_handler(sig, frame):
 def button_pressed_callback(channel):
     global status, check_, car
     if channel == 5 or channel == 6:
-       print("yes")
        car = input_direction(channel)
     else: 
        status = input_direction(channel)
        if status != check_:
-          print(status)
           check_ = status
 
 def settup_IO():

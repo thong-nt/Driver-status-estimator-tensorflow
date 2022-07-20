@@ -17,8 +17,6 @@ def input_direction(argument):
     }
     return switcher.get(argument, " ")
 
-
-
 class OLED:
     def __init__(self):
        self.status = "None"
@@ -59,6 +57,7 @@ class OLED:
     def stop(self):
         self.stopped = True
         self.t.join()
+
 
 '''
 if __name__ == "__main__":
