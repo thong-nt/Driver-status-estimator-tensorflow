@@ -16,12 +16,12 @@ class Warning:
        self.stopped = True
        # thread instantiation  
        self.t = Thread(target=self.buzzing, args=())
-       self.t.daemon = True # daemon threads run in background
- 
+       self.t.daemon = True
+
    def start(self):
         self.stopped = False
         self.t.start()
-   
+
    def buzzing(self):
        while True:
           if self.stopped is True :
@@ -31,11 +31,14 @@ class Warning:
              if self.status == "Distracted":
                 if self.act_dir != self.but:
                    buzzer.on()
+                   sleep(0.5)
+                   buzzer.off()
                 else:
                    buzzer.off()
              else:
                buzzer.off()
           else: buzzer.off()
+          sleep(2)
 
    def get_status(self, data, but):
        self.status = data.split('!')[0]
