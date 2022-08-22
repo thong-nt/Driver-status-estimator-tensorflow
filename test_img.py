@@ -39,7 +39,8 @@ def get_dist(df,df_dist,idx):
 
 if __name__ == '__main__':
     engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-    d = "/media/zek/UBUNTU 20_0/Newdataset/check/1/"
+    #d = "/media/zek/UBUNTU 20_0/Newdataset/check/1/"
+    d = "/home/zek/Thesis/Driver-status-estimator-tensorflow/media/report"
     df = pd.DataFrame(columns=features)
     df_dist = pd.DataFrame(columns=fdist)
 
@@ -65,17 +66,19 @@ if __name__ == '__main__':
                 #        (label.name, keypoint.point[0], keypoint.point[1], keypoint.score))
                     cv2.circle(img, (int(keypoint.point[0]*(inp_w/def_w)), 
                                         int(keypoint.point[1]*(inp_h/def_h))), 3, [0, 224, 255], -1)
-                    df.at[idx,label.name+'_x'] = keypoint.point[0]*(inp_w/def_w)
-                    df.at[idx,label.name+'_y'] = keypoint.point[1]*(inp_h/def_h)
-            if df.size > 0:
-                get_dist(df,df_dist,idx)
+            #        df.at[idx,label.name+'_x'] = keypoint.point[0]*(inp_w/def_w)
+            #        df.at[idx,label.name+'_y'] = keypoint.point[1]*(inp_h/def_h)
+            #if df.size > 0:
+            #    get_dist(df,df_dist,idx)
             
             #cv2.imshow('Test',img)
             #key = cv2.waitKey(0)
             #if key == ord('n'):
             #    continue
             idx += 1
+            cv2.imshow("Test", img)
+            key = cv2.waitKey(0)
         
-    print(df_dist)
-    file = '/media/zek/UBUNTU 20_0/Newdataset/files/false_16th_May.csv'
-    df_dist.to_csv(file, index=False)
+    #print(df_dist)
+    #file = '/media/zek/UBUNTU 20_0/Newdataset/files/false_16th_May.csv'
+    #df_dist.to_csv(file, index=False)

@@ -7,8 +7,12 @@ from pose_engine import PoseEngine
 from PIL import Image
 
 #default frame size of the model
-def_h = 480
-def_w = 640
+def_resolution = [[360, 480], [480, 640], [720, 1280]]
+# Initialize the size of input frames.
+#def_h = 480
+#def_w = 640
+def_h, def_w = def_resolution[1]
+
 
 features = ["neck_x", "neck_y", "nose_x", "nose_y",  "l_sho_x", "l_sho_y", "r_sho_x", "r_sho_y", "l_eye_x",	"l_eye_y", "r_eye_x", "r_eye_y",
     	"l_ear_x",	"l_ear_y", "r_ear_x",	"r_ear_y"]
@@ -44,7 +48,7 @@ def detect_pose(engine, img, inp_h, inp_w):
     df_dist = pd.DataFrame(columns=fdist)
     dir = "?"
     for pose in poses:
-      if pose.score < 0.25: continue
+      if pose.score < 0.20: continue #0.25
       
       for label, keypoint in pose.keypoints.items():
         #print('  %-20s x=%-4d y=%-4d score=%.1f' %
@@ -70,6 +74,7 @@ def detect_status(model, poses, img):
         cv2.putText(img, state[1], (0,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3)
         status = state[1]
     else:
+        
         y_pred = model.predict(poses)
         cv2.putText(img, state[y_pred[0]], (0,40), cv2.FONT_HERSHEY_SIMPLEX,1,(209, 80, 0, 255), 3) 
         status = state[y_pred[0]]
