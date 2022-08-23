@@ -17,7 +17,7 @@ resolution = [[360, 480], [480, 640], [720, 1280]]
 # Initialize the size of input frames.
 #inp_h = 720#360#480
 #inp_w = 1280#480#640
-inp_h, inp_w = resolution[1]
+inp_h, inp_w = resolution[0]
 
 def run(engine, model):
   # initializing and starting multi-threaded webcam input stream 
@@ -25,7 +25,7 @@ def run(engine, model):
   webcam_stream.start()
 
   connect_pi = Client(HEADER = 64, PORT = 5050, SERVER = "10.42.0.21")
-  #connect_pi.start()
+  connect_pi.start()
 
   idx = 0
   previouse_frame = 0
@@ -78,7 +78,7 @@ def run(engine, model):
                 lock.acquire()
                 pic, status = odd_thread.ret()
                 odd_thread.join()
-                #connect_pi.get_message(status)
+                connect_pi.get_message(status)
                 cv2.imshow('frame' , pic)
                 lock.release()
                 print("fps:", int(1 / (time.perf_counter() - previouse_frame)))
@@ -86,7 +86,7 @@ def run(engine, model):
                 lock.acquire() 
                 pic, status = even_thread.ret()
                 even_thread.join()
-                #connect_pi.get_message(status)
+                connect_pi.get_message(status)
                 cv2.imshow('frame' , pic) 
                 lock.release()
                 previouse_frame = time.perf_counter()
@@ -94,15 +94,15 @@ def run(engine, model):
             key = cv2.waitKey(1)
 
             if key == ord('q'):
-                #connect_pi.stop()
-                #connect_pi.client.shutdown(socket.SHUT_WR)
+                connect_pi.stop()
+                connect_pi.client.shutdown(socket.SHUT_WR)
                 webcam_stream.stop() # stop the webcam stream
                 del connect_pi, webcam_stream, odd_thread, even_thread
                 break
   
 if __name__ == '__main__':
   engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-  model = pickle.load(open("models/finalized_model.sav", 'rb'))
+  model = pickle.load(open("models/finalized_model_0.24.2.sav", 'rb'))
   run(engine, model)
   
 

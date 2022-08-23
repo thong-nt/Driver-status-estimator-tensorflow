@@ -48,7 +48,7 @@ def detect_pose(engine, img, inp_h, inp_w):
     df_dist = pd.DataFrame(columns=fdist)
     dir = "?"
     for pose in poses:
-      if pose.score < 0.20: continue #0.25
+      if pose.score < 0.25: continue #0.25
       
       for label, keypoint in pose.keypoints.items():
         #print('  %-20s x=%-4d y=%-4d score=%.1f' %
