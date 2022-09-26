@@ -1,6 +1,4 @@
-import time 
-import threading, queue
-import cv2
+import threading
 
 from pose_modules import *
 

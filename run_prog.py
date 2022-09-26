@@ -8,6 +8,7 @@ import time
 import cv2
 import threading, queue
 import pickle
+import matplotlib.pyplot as plt
 
 from WebcamStream import WebcamStream
 from threadscheduler import ODD, EVEN
@@ -19,13 +20,16 @@ resolution = [[360, 480], [480, 640], [720, 1280]]
 #inp_w = 1280#480#640
 inp_h, inp_w = resolution[0]
 
+from memory_profiler import profile
+@profile
+
 def run(engine, model):
   # initializing and starting multi-threaded webcam input stream 
   webcam_stream = WebcamStream(0, inp_h, inp_w) # 0 id for main camera
   webcam_stream.start()
 
   connect_pi = Client(HEADER = 64, PORT = 5050, SERVER = "10.42.0.21")
-  connect_pi.start()
+  #connect_pi.start()
 
   idx = 0
   previouse_frame = 0
@@ -34,7 +38,12 @@ def run(engine, model):
   even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
   lock = threading.Lock()
 
-  while(True):#time.time()-start < 30):
+  time_list = []
+  fps_list = []
+
+  start = time.perf_counter()
+
+  while(time.perf_counter()-start <= 60):
     if webcam_stream.stopped is True :
         break
     else :
@@ -56,8 +65,6 @@ def run(engine, model):
                 lock.acquire()
                 even_thread = EVEN(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
                 frame = cv2.flip(webcam_stream.read(),1)
-                #even_thread = EVEN(250, 280, queue_to_main, queue_to_worker, engine, model, idx)
-                #frame = cv2.flip(webcam_stream.read()[100:350,120:400] , 1)
                 even_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)
@@ -68,8 +75,6 @@ def run(engine, model):
                 lock.acquire()
                 odd_thread = ODD(inp_h, inp_w, queue_to_main, queue_to_worker, engine, model, idx)
                 frame = cv2.flip(webcam_stream.read(),1)
-                #odd_thread = ODD(250, 280, queue_to_main, queue_to_worker, engine, model, idx)
-                #frame = cv2.flip(webcam_stream.read()[100:350,120:400] , 1)
                 odd_thread.start()
                 idx += 1
                 queue_to_worker.put(frame)
@@ -78,31 +83,41 @@ def run(engine, model):
                 lock.acquire()
                 pic, status = odd_thread.ret()
                 odd_thread.join()
-                connect_pi.get_message(status)
+                #connect_pi.get_message(status)
                 cv2.imshow('frame' , pic)
                 lock.release()
-                print("fps:", int(1 / (time.perf_counter() - previouse_frame)))
+                #print("fps:", int(1 / (end - previouse_frame)))
             elif i == "even Done": 
                 lock.acquire() 
                 pic, status = even_thread.ret()
                 even_thread.join()
-                connect_pi.get_message(status)
+                #connect_pi.get_message(status)
                 cv2.imshow('frame' , pic) 
                 lock.release()
                 previouse_frame = time.perf_counter()
 
             key = cv2.waitKey(1)
 
+            end = time.perf_counter()
+            time_list.append((end - start))
+            fps_list.append(int(idx / (end - start)))
+
             if key == ord('q'):
-                connect_pi.stop()
-                connect_pi.client.shutdown(socket.SHUT_WR)
+                #connect_pi.stop()
+                #connect_pi.client.shutdown(socket.SHUT_WR)
                 webcam_stream.stop() # stop the webcam stream
                 del connect_pi, webcam_stream, odd_thread, even_thread
                 break
+    
+  plt.figure()
+  plt.plot(time_list, fps_list)
+  plt.xlabel('Time (s)')
+  plt.ylabel('FPS')
+  plt.show()
   
 if __name__ == '__main__':
   engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-  model = pickle.load(open("models/finalized_model_0.24.2.sav", 'rb'))
+  model = pickle.load(open("models/finalized_model.sav", 'rb'))
   run(engine, model)
   
 

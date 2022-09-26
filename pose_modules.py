@@ -57,14 +57,25 @@ def detect_pose(engine, img, inp_h, inp_w):
             if keypoint.point[0]*(inp_w/def_w) < inp_w/2-20: dir = "L"
             elif keypoint.point[0]*(inp_w/def_w) > inp_w/2+20: dir = "R"
             else: dir = "?"
+        #if label.name == "nose":
+        #    if keypoint.point[0]*(inp_w/def_w) < inp_w/2-20: dir = state[1]
+        #    elif keypoint.point[0]*(inp_w/def_w) > inp_w/2+20: dir = state[1]
+        #    elif keypoint.point[1]*(inp_h/def_h) > inp_h/2+20: dir = state[1]
+        #    elif keypoint.point[1]*(inp_h/def_h) < inp_h/2-30: dir = state[1]
+        #    else: dir = state[0]
 
         cv2.circle(img, (int(keypoint.point[0]*(inp_w/def_w)), 
                            int(keypoint.point[1]*(inp_h/def_h))), 3, [0, 224, 255], -1)
         df.at[0,label.name+'_x'] = keypoint.point[0]*(inp_w/def_w)
         df.at[0,label.name+'_y'] = keypoint.point[1]*(inp_h/def_h)
+        
 
     if df.size > 0:
         get_dist(df,df_dist)
+    #else:                       #del
+    #    dir = state[1]          #del
+
+    cv2.putText(img, dir, (250,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3) #del
 
     return img, df_dist, dir
 
