@@ -85,7 +85,7 @@ def detect_status(model, poses, img):
         cv2.putText(img, state[1], (0,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (209, 80, 0, 255), 3)
         status = state[1]
     else:
-        
+        poses=poses.fillna(0)
         y_pred = model.predict(poses)
         cv2.putText(img, state[y_pred[0]], (0,40), cv2.FONT_HERSHEY_SIMPLEX,1,(209, 80, 0, 255), 3) 
         status = state[y_pred[0]]

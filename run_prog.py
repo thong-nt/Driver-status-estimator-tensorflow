@@ -117,7 +117,7 @@ def run(engine, model):
   
 if __name__ == '__main__':
   engine = PoseEngine('models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')
-  model = pickle.load(open("models/finalized_model.sav", 'rb'))
+  model = pickle.load(open("models/xgb_model.sav", 'rb'))
   run(engine, model)
   
 
