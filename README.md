@@ -18,6 +18,7 @@ Note: to avoid invalid or incorrect results, sklearn version should be 0.24.2 an
 
 ## Setup
 + Rasperry Pi: Connect Pin IO like below picutre:
+
 ![alt text](https://github.com/zek213/Driver-status-estimator-tensorflow/blob/main/test_data/pin%20setup.JPG)
 
 + Connect Ethernet cable from NVIDIA Jetson board to Rasperry PI, change the IP address as well.
